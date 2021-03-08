@@ -71,8 +71,8 @@ export default defineComponent({
       const event: PointerEvent = e || window.event
       ctx.lineCap = 'round'
       ctx.lineJoin = 'round'
-      const x = event.offsetX
-      const y = event.offsetY
+      const x: number = event.offsetX
+      const y: number = event.offsetY
       ctx.beginPath()
       ctx.moveTo(x, y)
       ctx.lineWidth = getLineWidth(e)
@@ -88,9 +88,9 @@ export default defineComponent({
         return
       } else {
         console.log('move', e.pointerType, e.pressure, e.shiftKey)
-        const event = e || window.event
-        const x = event.offsetX
-        const y = event.offsetY
+        const event: PointerEvent = e || window.event
+        const x: number = event.offsetX
+        const y: number = event.offsetY
         ctx.lineWidth = getLineWidth(e)
         ctx.lineTo(x, y)
         ctx.stroke()
