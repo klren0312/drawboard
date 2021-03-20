@@ -40,24 +40,32 @@ export default defineComponent({
       useEventListener({
         el: canvas,
         name: 'pointerdown',
+        isDebounce: false,
+        wait: 0,
         listener: e => startDraw(<PointerEvent>e)
       })
 
       useEventListener({
         el: canvas,
         name: 'pointermove',
+        isDebounce: false,
+        wait: 0,
         listener: e => moveDraw(<PointerEvent>e)
       })
 
       useEventListener({
         el: canvas,
         name: 'pointerup',
+        isDebounce: false,
+        wait: 0,
         listener: e => cancelDraw(<PointerEvent>e)
       })
 
       useEventListener({
         el: canvas,
         name: 'pointerleave',
+        isDebounce: false,
+        wait: 0,
         listener: e => cancelDraw(<PointerEvent>e)
       })
     }
@@ -84,10 +92,10 @@ export default defineComponent({
      * @param {PointerEvent} e 事件
      */
     function moveDraw(e: PointerEvent) {
+      console.log('move', e.pointerType, e.pressure, e.shiftKey)
       if (!painting) {
         return
       } else {
-        console.log('move', e.pointerType, e.pressure, e.shiftKey)
         const event: PointerEvent = e || window.event
         const x: number = event.offsetX
         const y: number = event.offsetY
@@ -98,6 +106,7 @@ export default defineComponent({
     }
 
     function cancelDraw(e: PointerEvent) {
+      console.log('cancel')
       if (!painting) {
         return false
       }
