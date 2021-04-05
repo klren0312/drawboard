@@ -1,7 +1,10 @@
 <template>
   <div class="canvas-block">
     <canvas id="canvas"></canvas>
-    <button class="undo-btn" @click="undoHandle">undo</button>
+    <div class="btn-group">
+      <button @click="undoHandle">后退</button>
+      <button @click="clearHandle">清空</button>
+    </div>
   </div>
 </template>
 
@@ -151,8 +154,13 @@ export default defineComponent({
         ctx.clearRect(0, 0, canvas.width, canvas.height)  
       }
     }
+
+    function clearHandle() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+    }
     return {
-      undoHandle
+      undoHandle,
+      clearHandle
     }
   }
 })
@@ -171,7 +179,7 @@ export default defineComponent({
     touch-action: none;
     cursor: crosshair;
   }
-  .undo-btn {
+  .group-btn {
     position: absolute;
     top: 10px;
     left: 10px;
