@@ -4,12 +4,14 @@
     <div class="group-btn">
       <button @click="undoHandle">后退</button>
       <button @click="clearHandle">清空</button>
+      <label><input type="checkbox" v-model="isPen">笔模式</label>
+      <input type="color" v-model="lineColor">
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, onMounted } from 'vue'
+import { ref, defineComponent, onMounted, Ref } from 'vue'
 import { useEventListener } from '/@/hooks/useEventListener'
 interface PointObj {
   x: number,
@@ -20,7 +22,7 @@ export default defineComponent({
   setup: () => {
     let canvas: HTMLCanvasElement
     let ctx: CanvasRenderingContext2D
-    let lineColor: string = '#000' // 颜色
+    let lineColor: Ref<string> = ref('#000') // 颜色
     let painting: boolean = false // 是否处于状态
     let historyList: Array<ImageData> = []
     let pointerId: number // pointEvent id, 用于判断是否处于同一个笔划内
@@ -29,6 +31,8 @@ export default defineComponent({
       x: 0,
       y: 0
     }
+    let isPen: Ref<boolean> = ref(false)
+
     onMounted(() => {
       initCanvas()
     })
@@ -124,11 +128,14 @@ export default defineComponent({
      * @param {Boolean} isStart 是否是起始点
      */
     function doDraw(e, isStart = false) {
+      if (isPen.value && e.pointerType !== 'pen') {
+        return
+      }
       const event: PointerEvent = e || window.event
       const x: number = event.offsetX
       const y: number = event.offsetY
       ctx.lineWidth = getLineWidth(event)
-      ctx.strokeStyle = lineColor
+      ctx.strokeStyle = lineColor.value
       ctx.beginPath()
 
       if (!isStart) {
@@ -187,7 +194,9 @@ export default defineComponent({
     }
     return {
       undoHandle,
-      clearHandle
+      clearHandle,
+      isPen,
+      lineColor
     }
   }
 })
