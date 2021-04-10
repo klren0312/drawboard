@@ -1,0 +1,1 @@
+.canvas-block{position:relative;width:100%;height:100vh;overflow:hidden}.canvas-block #canvas{position:absolute;top:0;left:0;touch-action:none;cursor:crosshair}.canvas-block .group-btn{position:absolute;top:10px;left:10px;z-index:1;cursor:pointer;-ms-touch-action:none;touch-action:none;touch-action-delay:none}body{padding:0;margin:0}
