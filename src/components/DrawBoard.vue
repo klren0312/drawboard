@@ -1,7 +1,7 @@
 <template>
   <div class="canvas-block">
     <canvas id="canvas"></canvas>
-    <div class="btn-group">
+    <div class="group-btn">
       <button @click="undoHandle">后退</button>
       <button @click="clearHandle">清空</button>
     </div>
@@ -11,6 +11,10 @@
 <script lang="ts">
 import { ref, defineComponent, onMounted } from 'vue'
 import { useEventListener } from '/@/hooks/useEventListener'
+interface PointObj {
+  x: number,
+  y: number
+}
 export default defineComponent({
   name: 'DrawBoard',
   setup: () => {
@@ -19,6 +23,12 @@ export default defineComponent({
     let lineColor: string = '#000' // 颜色
     let painting: boolean = false // 是否处于状态
     let historyList: Array<ImageData> = []
+    let pointerId: number // pointEvent id, 用于判断是否处于同一个笔划内
+    // 用于使连线连续
+    let startXY: PointObj = {
+      x: 0,
+      y: 0
+    }
     onMounted(() => {
       initCanvas()
     })
@@ -79,15 +89,10 @@ export default defineComponent({
      */
     function startDraw(e: PointerEvent) {
       painting = true
-      const event: PointerEvent = e || window.event
+      pointerId = e.pointerId
       ctx.lineCap = 'round'
       ctx.lineJoin = 'round'
-      const x: number = event.offsetX
-      const y: number = event.offsetY
-      ctx.beginPath()
-      ctx.moveTo(x, y)
-      ctx.lineWidth = getLineWidth(e)
-      ctx.strokeStyle = lineColor
+      doDraw(e, true)
     }
 
     /**
@@ -95,27 +100,49 @@ export default defineComponent({
      * @param {PointerEvent} e 事件
      */
     function moveDraw(e: PointerEvent) {
-      console.log('move', e.pointerType, e.pressure, e.shiftKey)
-      if (!painting) {
+      if (!painting && e.pointerId !== pointerId) {
         return
       } else {
-        const event: PointerEvent = e || window.event
-        const x: number = event.offsetX
-        const y: number = event.offsetY
-        ctx.lineWidth = getLineWidth(e)
-        ctx.lineTo(x, y)
-        ctx.stroke()
+        doDraw(e)
       }
     }
 
     function cancelDraw(e: PointerEvent) {
       console.log('cancel')
+      pointerId = -1
       if (!painting) {
         return false
       }
       painting = false
       historyList.push(ctx.getImageData(0, 0, canvas.width, canvas.height))
       ctx.closePath()
+    }
+
+    /**
+     * 绘画
+     * @param {PointerEvent} e 事件
+     * @param {Boolean} isStart 是否是起始点
+     */
+    function doDraw(e, isStart = false) {
+      const event: PointerEvent = e || window.event
+      const x: number = event.offsetX
+      const y: number = event.offsetY
+      ctx.lineWidth = getLineWidth(event)
+      ctx.strokeStyle = lineColor
+      ctx.beginPath()
+
+      if (!isStart) {
+        ctx.moveTo(startXY.x, startXY.y)
+        ctx.lineTo(x, y)
+      } else {
+        ctx.moveTo(x, y)
+      }
+      ctx.closePath()
+      ctx.stroke()
+      startXY = {
+        x: x,
+        y: y
+      }
     }
 
     /**
@@ -183,6 +210,11 @@ export default defineComponent({
     position: absolute;
     top: 10px;
     left: 10px;
+    z-index: 1;
+    cursor: pointer;
+    -ms-touch-action: none;
+    touch-action: none;
+    touch-action-delay: none;
   }
 }
 </style>
